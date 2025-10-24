@@ -1,0 +1,61 @@
+CREATE DATABASE IF NOT EXISTS user_service_db;
+CREATE DATABASE IF NOT EXISTS product_service_db;
+CREATE DATABASE IF NOT EXISTS order_service_db;
+
+USE user_service_db;
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    phone VARCHAR(50),
+    address VARCHAR(500),
+    city VARCHAR(100),
+    state VARCHAR(100),
+    zip VARCHAR(20),
+    country VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+USE product_service_db;
+CREATE TABLE IF NOT EXISTS products (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    price DECIMAL(10, 2) NOT NULL,
+    stock INT DEFAULT 0,
+    category VARCHAR(100) NOT NULL,
+    image_url VARCHAR(500),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Sample products
+INSERT INTO products (name, description, price, stock, category, image_url) VALUES
+('Wireless Headphones Pro', 'Premium noise-cancelling wireless headphones with 30-hour battery life', 149.99, 50, 'Electronics', 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400'),
+('Smart Watch Ultra', 'Fitness tracker with heart rate monitor, GPS, and sleep tracking', 299.99, 30, 'Electronics', 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400'),
+('Bluetooth Speaker', 'Portable waterproof Bluetooth speaker with 360° sound', 69.99, 80, 'Electronics', 'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=400');
+
+USE order_service_db;
+CREATE TABLE IF NOT EXISTS orders (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    total_amount DECIMAL(10, 2) NOT NULL,
+    status VARCHAR(50) DEFAULT 'pending',
+    shipping_name VARCHAR(255),
+    shipping_address VARCHAR(500),
+    shipping_city VARCHAR(100),
+    shipping_state VARCHAR(100),
+    shipping_zip VARCHAR(20),
+    shipping_country VARCHAR(100),
+    shipping_phone VARCHAR(50),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS order_items (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id INT NOT NULL,
+    product_id INT NOT NULL,
+    quantity INT NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES orders(id)
+);
