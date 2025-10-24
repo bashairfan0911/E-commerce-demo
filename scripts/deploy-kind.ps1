@@ -33,13 +33,13 @@ if ($existingCluster) {
 }
 
 kind create cluster --config kind-config.yaml
-Write-Host "✓ Kind cluster created successfully" -ForegroundColor Green
+Write-Host "Kind cluster created successfully" -ForegroundColor Green
 Write-Host ""
 
 # Wait for cluster to be ready
 Write-Host "Step 2: Waiting for cluster to be ready..." -ForegroundColor Yellow
 kubectl wait --for=condition=Ready nodes --all --timeout=120s
-Write-Host "✓ Cluster is ready" -ForegroundColor Green
+Write-Host "Cluster is ready" -ForegroundColor Green
 Write-Host ""
 
 # Build Docker images
@@ -49,7 +49,7 @@ docker build -t product-service:latest ./backend/product-service
 docker build -t order-service:latest ./backend/order-service
 docker build -t api-gateway:latest ./backend/api-gateway
 docker build -t ecommerce-frontend:latest ./frontend
-Write-Host "✓ Docker images built successfully" -ForegroundColor Green
+Write-Host "Docker images built successfully" -ForegroundColor Green
 Write-Host ""
 
 # Load images into Kind cluster
@@ -59,29 +59,25 @@ kind load docker-image product-service:latest --name ecommerce
 kind load docker-image order-service:latest --name ecommerce
 kind load docker-image api-gateway:latest --name ecommerce
 kind load docker-image ecommerce-frontend:latest --name ecommerce
-Write-Host "✓ Images loaded into Kind cluster" -ForegroundColor Green
+Write-Host "Images loaded into Kind cluster" -ForegroundColor Green
 Write-Host ""
 
 # Create namespace
 Write-Host "Step 5: Creating namespace..." -ForegroundColor Yellow
 kubectl create namespace ecommerce --dry-run=client -o yaml | kubectl apply -f -
-Write-Host "✓ Namespace created" -ForegroundColor Green
+Write-Host "Namespace created" -ForegroundColor Green
 Write-Host ""
 
 # Deploy with Helm
 Write-Host "Step 6: Deploying application with Helm..." -ForegroundColor Yellow
-helm upgrade --install ecommerce ./helm-chart `
-    --namespace ecommerce `
-    --set image.pullPolicy=IfNotPresent `
-    --wait `
-    --timeout 10m
-Write-Host "✓ Application deployed successfully" -ForegroundColor Green
+helm upgrade --install ecommerce ./helm-chart --namespace ecommerce --set image.pullPolicy=IfNotPresent --wait --timeout 10m
+Write-Host "Application deployed successfully" -ForegroundColor Green
 Write-Host ""
 
 # Wait for all pods to be ready
 Write-Host "Step 7: Waiting for all pods to be ready..." -ForegroundColor Yellow
 kubectl wait --for=condition=ready pod --all -n ecommerce --timeout=600s
-Write-Host "✓ All pods are ready" -ForegroundColor Green
+Write-Host "All pods are ready" -ForegroundColor Green
 Write-Host ""
 
 # Display deployment information
