@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ecommerce-dashboard
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+data:
+  ecommerce-dashboard.json: |
+    {
+      "dashboard": {
+        "title": "E-commerce Application Dashboard",
+        "panels": [
+          {
+            "title": "Pod CPU Usage",
+            "targets": [
+              {
+                "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"ecommerce\"}[5m])) by (pod)"
+              }
+            ],
+            "type": "graph"
+          },
+          {
+            "title": "Pod Memory Usage",
+            "targets": [
+              {
+                "expr": "sum(container_memory_usage_bytes{namespace=\"ecommerce\"}) by (pod)"
+              }
+            ],
+            "type": "graph"
+          },
+          {
+            "title": "HTTP Request Rate",
+            "targets": [
+              {
+                "expr": "sum(rate(http_requests_total{namespace=\"ecommerce\"}[5m])) by (service)"
+              }
+            ],
+            "type": "graph"
+          },
+          {
+            "title": "Pod Status",
+            "targets": [
+              {
+                "expr": "kube_pod_status_phase{namespace=\"ecommerce\"}"
+              }
+            ],
+            "type": "stat"
+          }
+        ]
+      }
+    }

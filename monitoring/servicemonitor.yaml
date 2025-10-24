@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ecommerce-app-metrics
+  namespace: ecommerce
+  labels:
+    app: ecommerce-metrics
+spec:
+  selector:
+    app: frontend
+  ports:
+  - name: metrics
+    port: 9090
+    targetPort: 80
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: ecommerce-app-monitor
+  namespace: ecommerce
+  labels:
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: frontend
+  endpoints:
+  - port: metrics
+    interval: 30s
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: ecommerce-backend-monitor
+  namespace: ecommerce
+  labels:
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: api-gateway
+  endpoints:
+  - port: http
+    interval: 30s

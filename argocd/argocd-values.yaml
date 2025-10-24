@@ -1,0 +1,29 @@
+server:
+  service:
+    type: NodePort
+    nodePortHttp: 30700
+    nodePortHttps: 30701
+  extraArgs:
+    - --insecure
+
+configs:
+  params:
+    server.insecure: true
+
+redis:
+  enabled: true
+
+controller:
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+
+repoServer:
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+
+applicationSet:
+  enabled: true
