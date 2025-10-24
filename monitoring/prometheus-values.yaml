@@ -1,4 +1,7 @@
 prometheus:
+  service:
+    type: NodePort
+    nodePort: 30909
   prometheusSpec:
     serviceMonitorSelectorNilUsesHelmValues: false
     podMonitorSelectorNilUsesHelmValues: false
