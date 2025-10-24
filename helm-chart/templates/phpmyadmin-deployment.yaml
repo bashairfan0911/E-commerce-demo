@@ -1,0 +1,47 @@
+{{- if .Values.phpmyadmin.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ecommerce-app.fullname" . }}-phpmyadmin
+  labels:
+    app: phpmyadmin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: phpmyadmin
+  template:
+    metadata:
+      labels:
+        app: phpmyadmin
+    spec:
+      containers:
+      - name: phpmyadmin
+        image: {{ .Values.phpmyadmin.image }}
+        ports:
+        - containerPort: 80
+        env:
+        - name: PMA_HOST
+          value: {{ include "ecommerce-app.fullname" . }}-mysql
+        - name: PMA_PORT
+          value: "3306"
+        - name: PMA_USER
+          value: root
+        - name: PMA_PASSWORD
+          value: {{ .Values.mysql.rootPassword }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ecommerce-app.fullname" . }}-phpmyadmin
+spec:
+  selector:
+    app: phpmyadmin
+  ports:
+  - port: {{ .Values.phpmyadmin.service.port }}
+    targetPort: 80
+    {{- if eq .Values.phpmyadmin.service.type "NodePort" }}
+    nodePort: {{ .Values.phpmyadmin.service.nodePort }}
+    {{- end }}
+  type: {{ .Values.phpmyadmin.service.type }}
+{{- end }}

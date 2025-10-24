@@ -1,0 +1,46 @@
+{{- if .Values.frontend.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ecommerce-app.fullname" . }}-frontend
+  labels:
+    app: frontend
+spec:
+  replicas: {{ .Values.frontend.replicaCount }}
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: "{{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: 3000
+        env:
+        - name: REACT_APP_API_URL
+          value: {{ .Values.frontend.env.apiUrl }}
+        - name: REACT_APP_GOOGLE_CLIENT_ID
+          value: {{ .Values.frontend.env.googleClientId }}
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ecommerce-app.fullname" . }}-frontend
+spec:
+  selector:
+    app: frontend
+  ports:
+  - port: {{ .Values.frontend.service.port }}
+    targetPort: 3000
+    {{- if eq .Values.frontend.service.type "NodePort" }}
+    nodePort: {{ .Values.frontend.service.nodePort }}
+    {{- end }}
+  type: {{ .Values.frontend.service.type }}
+{{- end }}

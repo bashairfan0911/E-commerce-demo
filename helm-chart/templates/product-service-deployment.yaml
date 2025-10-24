@@ -1,0 +1,47 @@
+{{- if .Values.productService.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ecommerce-app.fullname" . }}-product-service
+  labels:
+    app: product-service
+spec:
+  replicas: {{ .Values.productService.replicaCount }}
+  selector:
+    matchLabels:
+      app: product-service
+  template:
+    metadata:
+      labels:
+        app: product-service
+    spec:
+      containers:
+      - name: product-service
+        image: "{{ .Values.productService.image.repository }}:{{ .Values.productService.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: 8002
+        env:
+        - name: DB_HOST
+          value: {{ include "ecommerce-app.fullname" . }}-mysql
+        - name: DB_USER
+          value: root
+        - name: DB_PASSWORD
+          value: {{ .Values.mysql.rootPassword }}
+        - name: DB_NAME
+          value: {{ .Values.productService.env.dbName }}
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ecommerce-app.fullname" . }}-product-service
+spec:
+  selector:
+    app: product-service
+  ports:
+  - port: {{ .Values.productService.service.port }}
+    targetPort: 8002
+  type: {{ .Values.productService.service.type }}
+{{- end }}

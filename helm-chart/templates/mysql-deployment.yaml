@@ -1,0 +1,63 @@
+{{- if .Values.mysql.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ecommerce-app.fullname" . }}-mysql
+  labels:
+    app: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - name: mysql
+        image: {{ .Values.mysql.image }}
+        ports:
+        - containerPort: 3306
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: {{ .Values.mysql.rootPassword }}
+        volumeMounts:
+        - name: mysql-storage
+          mountPath: /var/lib/mysql
+        - name: init-script
+          mountPath: /docker-entrypoint-initdb.d
+      volumes:
+      - name: mysql-storage
+        persistentVolumeClaim:
+          claimName: {{ include "ecommerce-app.fullname" . }}-mysql-pvc
+      - name: init-script
+        configMap:
+          name: {{ include "ecommerce-app.fullname" . }}-mysql-init
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ecommerce-app.fullname" . }}-mysql
+spec:
+  selector:
+    app: mysql
+  ports:
+  - port: {{ .Values.mysql.service.port }}
+    targetPort: 3306
+  type: ClusterIP
+---
+{{- if .Values.mysql.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "ecommerce-app.fullname" . }}-mysql-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.mysql.persistence.size }}
+{{- end }}
+{{- end }}

@@ -1,0 +1,13 @@
+apiVersion: v2
+name: ecommerce-app
+description: A Helm chart for E-commerce Microservices Application
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - ecommerce
+  - microservices
+  - react
+  - flask
+maintainers:
+  - name: E-commerce Team

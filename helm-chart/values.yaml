@@ -1,0 +1,119 @@
+replicaCount: 1
+
+image:
+  pullPolicy: IfNotPresent
+
+# MySQL Configuration
+mysql:
+  enabled: true
+  image: mysql:8.0
+  rootPassword: rootpassword
+  persistence:
+    enabled: true
+    size: 10Gi
+  service:
+    port: 3306
+
+# PHPMyAdmin Configuration
+phpmyadmin:
+  enabled: true
+  image: phpmyadmin/phpmyadmin
+  service:
+    type: NodePort
+    port: 80
+    nodePort: 30080
+
+# User Service Configuration
+userService:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: user-service
+    tag: latest
+  service:
+    type: ClusterIP
+    port: 8001
+  env:
+    dbName: user_service_db
+    googleClientId: "your-google-client-id"
+
+# Product Service Configuration
+productService:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: product-service
+    tag: latest
+  service:
+    type: ClusterIP
+    port: 8002
+  env:
+    dbName: product_service_db
+
+# Order Service Configuration
+orderService:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: order-service
+    tag: latest
+  service:
+    type: ClusterIP
+    port: 8003
+  env:
+    dbName: order_service_db
+
+# API Gateway Configuration
+apiGateway:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: api-gateway
+    tag: latest
+  service:
+    type: NodePort
+    port: 8000
+    nodePort: 30800
+
+# Frontend Configuration
+frontend:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: ecommerce-frontend
+    tag: latest
+  service:
+    type: NodePort
+    port: 3000
+    nodePort: 30300
+  env:
+    apiUrl: "http://localhost:30800/api"
+    googleClientId: "your-google-client-id"
+
+# Resource Limits
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+# Ingress Configuration
+ingress:
+  enabled: false
+  className: nginx
+  annotations: {}
+  hosts:
+    - host: ecommerce.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+# Autoscaling
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
